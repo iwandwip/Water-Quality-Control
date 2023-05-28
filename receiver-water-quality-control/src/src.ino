@@ -17,6 +17,8 @@ SerialCom com;
 
 float value[5];
 
+DigitalOut led(2);
+
 void setup() {
         Serial.begin(115200);
         firebase.connectToWiFi("Polinema Hotspot AJ LT 3 Tengah", "");
@@ -48,10 +50,12 @@ void setup() {
 void loop() {
         int packetSize = LoRa.parsePacket();
         if (packetSize) {
+                led.on();
                 String dataBuffer;
                 while (LoRa.available())
                         dataBuffer += (char)LoRa.read();
                 onReceive(dataBuffer);
+                led.off();
         }
 }
 

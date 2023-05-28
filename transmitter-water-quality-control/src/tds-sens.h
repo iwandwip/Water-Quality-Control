@@ -17,7 +17,7 @@
 class TDS : public BaseSens {
        private:
         uint8_t sensorPin;
-        float* templateValue;
+        float* tdsValue;
         int buff[30], temp[30];
         int buffIndex;
         float averageVolt, temperature;

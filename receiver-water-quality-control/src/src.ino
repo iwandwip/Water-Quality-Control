@@ -1,109 +1,78 @@
-// Libraries for LoRa
-#include <LoRa.h>
-#include <SPI.h>
+#include "Adafruit_GFX.h"
+#include "Adafruit_SSD1306.h"
+#include "Arduino.h"
+#include "LoRa.h"
+#include "SPI.h"
+#include "Wire.h"
+#include "firebase-handler.h"
+#include "input-module.h"
+#include "output-module.h"
+#include "serial-com.h"
 
-// Libraries for OLED Display
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
-#include <Wire.h>
+void onReceive(String data);
 
-// define the pins used by the LoRa transceiver module
-#define SCK 5
-#define MISO 19
-#define MOSI 27
-#define SS 18
-#define RST 14
-#define DIO0 26
+Adafruit_SSD1306 display(128, 64, &Wire, 16);
+FirebaseModule firebase;
+SerialCom com;
 
-// 433E6 for Asia
-// 866E6 for Europe
-// 915E6 for North America
-#define BAND 866E6
-
-// OLED pins
-#define OLED_SDA 4
-#define OLED_SCL 15
-#define OLED_RST 16
-#define SCREEN_WIDTH 128  // OLED display width, in pixels
-#define SCREEN_HEIGHT 64  // OLED display height, in pixels
-
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RST);
-
-String LoRaData;
+float value[5];
 
 void setup() {
-        // initialize Serial Monitor
         Serial.begin(115200);
+        firebase.connectToWiFi("Polinema Hotspot AJ LT 3 Tengah", "");
+        firebase.waitConnection(1000);
+        firebase.init();
 
-        // reset OLED display via software
-        pinMode(OLED_RST, OUTPUT);
-        digitalWrite(OLED_RST, LOW);
+        SPI.begin(5, 19, 27, 18);
+        LoRa.setPins(18, 14, 26);
+        if (!LoRa.begin(866E6))
+                while (1) Serial.println("Failed");
+
+        pinMode(16, OUTPUT);
+        digitalWrite(16, LOW);
         delay(20);
-        digitalWrite(OLED_RST, HIGH);
-
-        // initialize OLED
-        Wire.begin(OLED_SDA, OLED_SCL);
-        if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3c, false, false)) {  // Address 0x3C for 128x32
-                Serial.println(F("SSD1306 allocation failed"));
-                for (;;)
-                        ;  // Don't proceed, loop forever
+        digitalWrite(16, HIGH);
+        Wire.begin(4, 15);
+        if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3c, false, false)) {
+                for (;;) Serial.println(F("SSD1306 allocation failed"));
         }
 
         display.clearDisplay();
         display.setTextColor(WHITE);
         display.setTextSize(1);
         display.setCursor(0, 0);
-        display.print("LORA RECEIVER ");
-        display.display();
-
-        Serial.println("LoRa Receiver Test");
-
-        // SPI LoRa pins
-        SPI.begin(SCK, MISO, MOSI, SS);
-        // setup LoRa transceiver module
-        LoRa.setPins(SS, RST, DIO0);
-
-        if (!LoRa.begin(BAND)) {
-                Serial.println("Starting LoRa failed!");
-                while (1)
-                        ;
-        }
-        Serial.println("LoRa Initializing OK!");
-        display.setCursor(0, 10);
-        display.println("LoRa Initializing OK!");
+        display.print("INITIALIZE ");
         display.display();
 }
 
 void loop() {
-        // try to parse packet
         int packetSize = LoRa.parsePacket();
         if (packetSize) {
-                // received a packet
-                Serial.print("Received packet ");
+                String dataBuffer;
+                while (LoRa.available())
+                        dataBuffer += (char)LoRa.read();
+                onReceive(dataBuffer);
+        }
+}
 
-                // read packet
-                while (LoRa.available()) {
-                        LoRaData = LoRa.readString();
-                        Serial.print(LoRaData);
+void serverHandler(void* pvParameter) {
+        firebase.waitConnection(3000);
+        for (;;) {
+                if (firebase.isConnect()) {
+                        firebase.clearData();
+                        firebase.addData(value[0], "/sonar-value");
+                        firebase.addData(value[1], "/temperature-value");
+                        firebase.addData(value[2], "/ph-value");
+                        firebase.addData(value[3], "/turbidity-value");
+                        firebase.addData(value[4], "/tds-value");
+                        firebase.sendData(2000);
                 }
+                vTaskDelay(20 / portTICK_PERIOD_MS);
+        }
+}
 
-                // print RSSI of packet
-                int rssi = LoRa.packetRssi();
-                Serial.print(" with RSSI ");
-                Serial.println(rssi);
-
-                // Dsiplay information
-                display.clearDisplay();
-                display.setCursor(0, 0);
-                display.print("LORA RECEIVER");
-                display.setCursor(0, 20);
-                display.print("Received packet:");
-                display.setCursor(0, 30);
-                display.print(LoRaData);
-                display.setCursor(0, 40);
-                display.print("RSSI:");
-                display.setCursor(30, 40);
-                display.print(rssi);
-                display.display();
+void onReceive(String data) {
+        for (uint8_t i = 0; i < 5; i++) {
+                value[i] = com.getData(data, i);
         }
 }

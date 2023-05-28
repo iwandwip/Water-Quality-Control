@@ -41,6 +41,7 @@ void Sonar::update() {
                         *distance = sonar->ping_cm();
                         *distance = *distance + (*distance * SONAR_FILTER_KF);
                         *distance /= SONAR_FILTER_KF + 1;
+                        *distance = (*distance > 200) ? 200 : *distance;
                 } else {
                         SimpleKalmanFilter* sonarKf = new SimpleKalmanFilter(2, 2, 0.01);
                         distance[SENS_RET_RAW_DATA] = sonar->ping_cm();

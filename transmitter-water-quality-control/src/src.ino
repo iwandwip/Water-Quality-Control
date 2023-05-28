@@ -90,7 +90,7 @@ void loop() {
                 com.addData(value[i]);
         }
         static uint32_t loraTimer;
-        if (millis() - loraTimer >= 500) {
+        if (millis() - loraTimer >= 1000) {
                 led.on();
                 LoRa.beginPacket();
                 LoRa.print(com.getAllData());

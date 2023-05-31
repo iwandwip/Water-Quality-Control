@@ -54,7 +54,7 @@ void PHsens::update() {
                 if (!isCalibrate) {
                         *phValue = (float)average * 3.3 / 4096.0 / 6;
                         *phValue = *phValue * 3.5;
-                        *phValue = *phValue * (5.0 / 1023.0);
+
                         *phValue = *phValue + (*phValue * SENSOR_FILTER_KF);
                         *phValue /= SENSOR_FILTER_KF + 1;
                 } else {

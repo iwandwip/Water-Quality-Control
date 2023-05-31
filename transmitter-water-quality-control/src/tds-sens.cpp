@@ -51,7 +51,6 @@ void TDS::update() {
                         float volt = averageVolt / coeff;
                         *tdsValue = (133.42 * volt * volt * volt - 255.86 * volt * volt + 857.39 * volt) * 0.5;
 
-                        *tdsValue = *tdsValue * (5.0 / 1023.0);
                         *tdsValue = *tdsValue + (*tdsValue * SENSOR_FILTER_KF);
                         *tdsValue /= SENSOR_FILTER_KF + 1;
                 } else {

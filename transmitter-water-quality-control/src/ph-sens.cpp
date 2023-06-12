@@ -52,7 +52,7 @@ void PHsens::update() {
                 for (int i = 2; i < 8; i++)
                         average += buff[i];
                 if (!isCalibrate) {
-                        *phValue = (float)average * 3.3 / 4096.0 / 6;
+                        *phValue = (float)average * 3.3 / 4096.0 / 6.0;
                         *phValue = *phValue * 3.5;
 
                         *phValue = *phValue + (*phValue * SENSOR_FILTER_KF);

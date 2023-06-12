@@ -21,22 +21,22 @@ SensorModule sensor;
 float value[5];
 
 Adafruit_SSD1306 display(128, 64, &Wire, 16);
-DigitalOut relaySatu(12);
-DigitalOut relayDua(13);
-DigitalOut relayTiga(32);
-DigitalOut relayEmpat(33);
-DigitalOut led(2);
-DigitalOut buzzer(21);
+// DigitalOut relaySatu(12);
+// DigitalOut relayDua(13);
+// DigitalOut relayTiga(32);
+// DigitalOut relayEmpat(33);
+// DigitalOut led(2);
+// DigitalOut buzzer(21);
 
 SerialCom com;
 
 void setup() {
         Serial.begin(115200);
-        sensor.addModule(new Sonar(22, 23));
-        sensor.addModule(new DS18b20(36));
-        sensor.addModule(new PHsens(37));
-        sensor.addModule(new Turbidity(38));
-        sensor.addModule(new TDS(39));
+        sensor.addModule(new Sonar(13, 12));  // (22, 23)
+        sensor.addModule(new DS18b20(2));     // (36)
+        sensor.addModule(new PHsens(12));     // (37)
+        sensor.addModule(new Turbidity(25));  // (38)
+        sensor.addModule(new TDS(34));        // (39)
         sensor.init();
 
         SPI.begin(5, 19, 27, 18);
@@ -91,12 +91,22 @@ void loop() {
         }
         static uint32_t loraTimer;
         if (millis() - loraTimer >= 1000) {
-                led.on();
+                // led.on();
+                // relaySatu.on();
+                // relayDua.on();
+                // relayTiga.on();
+                // relayEmpat.on();
+
                 LoRa.beginPacket();
                 LoRa.print(com.getAllData());
                 LoRa.endPacket();
                 loraTimer = millis();
-                led.off();
+
+                // led.off();
+                // relaySatu.off();
+                // relayDua.off();
+                // relayTiga.off();
+                // relayEmpat.off();
         }
 }
 

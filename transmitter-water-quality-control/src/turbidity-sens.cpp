@@ -38,7 +38,7 @@ void Turbidity::update() {
         if (millis() - update_tm >= 500) {
                 if (!isCalibrate) {
                         *turbidityValue = analogRead(sensorPin);
-                        *turbidityValue = *turbidityValue * (3.3 / 4096.0);
+                        // *turbidityValue = *turbidityValue * (3.3 / 4096.0);
 
                         *turbidityValue = *turbidityValue + (*turbidityValue * SENSOR_FILTER_KF);
                         *turbidityValue /= SENSOR_FILTER_KF + 1;

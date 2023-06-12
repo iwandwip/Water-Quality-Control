@@ -19,8 +19,9 @@ class TDS : public BaseSens {
         uint8_t sensorPin;
         float* tdsValue;
         int buff[30], temp[30];
-        int buffIndex;
-        float averageVolt, temperature;
+        int buffIndex = 0;
+        float averageVolt = 0;
+        float temperature = 0;
 
         uint32_t update_tm;
         uint16_t sample_tm;

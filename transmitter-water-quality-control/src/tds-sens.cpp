@@ -17,6 +17,7 @@ TDS::TDS()
         isCalibrate = false;
         tdsValue = (isCalibrate) ? new float[SENS_RET_TOTAL_DATA] : new float;
         if (isCalibrate) cal_tm = new uint32_t;
+        buffIndex = 0;
 }
 
 TDS::TDS(uint8_t __pin, bool enableCalibrate) {
@@ -24,6 +25,7 @@ TDS::TDS(uint8_t __pin, bool enableCalibrate) {
         isCalibrate = enableCalibrate;
         tdsValue = (isCalibrate) ? new float[SENS_RET_TOTAL_DATA] : new float;
         if (isCalibrate) cal_tm = new uint32_t;
+        buffIndex = 0;
 }
 
 TDS::~TDS() {
@@ -35,24 +37,27 @@ void TDS::init() {
 }
 
 void TDS::update() {
-        if (millis() - sample_tm >= 40) {
-                buff[buffIndex] = analogRead(sensorPin);
-                buffIndex++;
-                if (buffIndex == 30) buffIndex = 0;
+        if (millis() - sample_tm >= 40U) {
+                *tdsValue = analogRead(sensorPin);
+                // buff[buffIndex] = analogRead(sensorPin);
+                // buffIndex++;
+                // if (buffIndex >= 30) buffIndex = 0;
                 sample_tm = millis();
         }
-        if (millis() - update_tm >= 800) {
+        if (millis() - update_tm >= 800U) {
                 if (!isCalibrate) {
-                        for (int i = 0; i < 30; i++) {
-                                temp[i] = buff[i];
-                        }
-                        averageVolt = getMedianNum(temp, 30) * (float)3.3 / 4096.0;
-                        float coeff = 1.0 + 0.02 * (temperature - 25.0);
-                        float volt = averageVolt / coeff;
-                        *tdsValue = (133.42 * volt * volt * volt - 255.86 * volt * volt + 857.39 * volt) * 0.5;
+                        // for (int i = 0; i < 30; i++) {
+                        //         temp[i] = buff[i];
+                        //         temp[i] = (temp[i] > 4095.0) ? 4095.0 : temp[i];
+                        // }
+                        // averageVolt = getMedianNum(temp, 30) * (float)3.3 / 4095.0;
+                        // float coeff = 1.0 + 0.02 * (temperature - 25.0);
+                        // float volt = averageVolt / coeff;
+                        // *tdsValue = (133.42 * volt * volt * volt - 255.86 * volt * volt + 857.39 * volt) * 0.5;
 
-                        *tdsValue = *tdsValue + (*tdsValue * SENSOR_FILTER_KF);
-                        *tdsValue /= SENSOR_FILTER_KF + 1;
+                        // *tdsValue = *tdsValue + (*tdsValue * SENSOR_FILTER_KF);
+                        // *tdsValue /= SENSOR_FILTER_KF + 1;
+                        // *tdsValue = (*tdsValue > 15000.0) ? 15000.0 : *tdsValue;
                 } else {
                         SimpleKalmanFilter* sonarKf = new SimpleKalmanFilter(2, 2, 0.01);
                         tdsValue[SENS_RET_RAW_DATA] = analogRead(sensorPin);

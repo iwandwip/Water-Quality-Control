@@ -15,6 +15,7 @@ float sensorValue[5];
 Adafruit_SSD1306 display(128, 64, &Wire, 16);
 SerialCom com;
 TimerTicks loraTime(1000);
+TimerTicks serialTime(1000);
 
 const int fis_gcI = 5;
 const int fis_gcO = 5;
@@ -64,15 +65,27 @@ void loop() {
 
         fis_evaluate();
 
-        com.clearData();
-        com.addData(g_fisOutput[0]);  // Set output value: Pengisian
-        com.addData(g_fisOutput[1]);  // Set output value: Pengurasan
-        com.addData(g_fisOutput[2]);  // Set output value: Heater
-        com.addData(g_fisOutput[3]);  // Set output value: Cairan_Asam
-        com.addData(g_fisOutput[4]);  // Set output value: Cairan_Basa
-        com.sendData();
-        com.receive(onReceive);
+        if (serialTime.tick()) {
+                Serial.print(g_fisOutput[0]);
+                Serial.print(" ");
+                Serial.print(g_fisOutput[1]);
+                Serial.print(" ");
+                Serial.print(g_fisOutput[2]);
+                Serial.print(" ");
+                Serial.print(g_fisOutput[3]);
+                Serial.print(" ");
+                Serial.print(g_fisOutput[4]);
+                Serial.println();
+        }
+        // com.clearData();
+        // com.addData(g_fisOutput[0]);  // Set output value: Pengisian
+        // com.addData(g_fisOutput[1]);  // Set output value: Pengurasan
+        // com.addData(g_fisOutput[2]);  // Set output value: Heater
+        // com.addData(g_fisOutput[3]);  // Set output value: Cairan_Asam
+        // com.addData(g_fisOutput[4]);  // Set output value: Cairan_Basa
+        // com.sendData();
 
+        com.receive(onReceive);
         displayOled();
         // debug();
 }

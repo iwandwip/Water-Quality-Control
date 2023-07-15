@@ -1,13 +1,18 @@
-#include "sonar-sens.h"
+#include "NewPing.h"
 
-SonarSens sonar(12, 11);
+#define ULTRASONIC_TRIGG_PIN 11
+#define ULTRASONIC_ECHO_PIN 12
+
+NewPing sonar(ULTRASONIC_TRIGG_PIN, ULTRASONIC_ECHO_PIN, 200);
+float ultrasonicValue;
 
 void setup() {
         Serial.begin(9600);
-        sonar.init();
 }
 
 void loop() {
-        sonar.update();
-        sonar.debug();
+        ultrasonicValue = sonar.ping_cm();
+        Serial.print("Ultrasonic: ");
+        Serial.println(ultrasonicValue);
+        delay(50);
 }

@@ -13,6 +13,9 @@
 #define WIFI_SSID "FreshwaterAquaculture"
 #define WIFI_PASSWORD "1234567890"
 
+// #define WIFI_SSID "KASTARA GROUP INDONESIA"
+// #define WIFI_PASSWORD "KASTARA@2022"
+
 #define API_KEY "AIzaSyAzYdsu_LMrp86Ec3oezJsJdckmh1_FWPM"
 #define DATABASE_URL "https://water-quality-control-616f0-default-rtdb.firebaseio.com/"
 #define USER_EMAIL "water-quality@gmail.com"
@@ -33,6 +36,8 @@ float pHValue, tdsValue;
 
 float statePengisian, statePengurasan, stateHeater;
 float statePhDown, statePhUp, stateMode;
+
+String cekKoneksi = "X";
 
 void setup() {
         Serial.begin(115200);
@@ -112,7 +117,7 @@ void loop() {
                 loraData += String(statePhDown) + " ";
                 loraData += String(statePhUp) + " ";
                 loraData += String(stateMode) + " ";
-                
+
                 LoRa.beginPacket();
                 LoRa.print(loraData);
                 LoRa.endPacket();
@@ -121,24 +126,24 @@ void loop() {
         debug();
 
         display.clearDisplay();
-        display.setCursor(20, 0);
-        display.println("SENSORS MONITOR");
+        display.setCursor(5, 0);
+        display.print("SENSORS MONITOR | " + String(cekKoneksi));
         display.setTextSize(1);
         display.setCursor(0, 10);
         display.print("SONAR : ");
-        display.println(ultrasonicValue);
+        display.print(ultrasonicValue);
         display.setCursor(0, 20);
         display.print("TURB  : ");
-        display.println(turbidityValue);
+        display.print(turbidityValue);
         display.setCursor(0, 30);
         display.print("TEMP  : ");
-        display.println(temperatureValue);
+        display.print(temperatureValue);
         display.setCursor(0, 40);
         display.print("PH    : ");
-        display.println(pHValue);
+        display.print(pHValue);
         display.setCursor(0, 50);
         display.print("TDS   : ");
-        display.println(tdsValue);
+        display.print(tdsValue);
         display.display();
 }
 
@@ -153,21 +158,39 @@ void serverHandler(void* pvParameter) {
 
                         if (Firebase.RTDB.getString(&fbdo, "/btn-pengisian")) {
                                 statePengisian = fbdo.to<String>().toFloat();
+                                cekKoneksi = "V";
+                        } else {
+                                cekKoneksi = "X";
                         }
                         if (Firebase.RTDB.getString(&fbdo, "/btn-pengurasan")) {
                                 statePengurasan = fbdo.to<String>().toFloat();
+                                cekKoneksi = "V";
+                        } else {
+                                cekKoneksi = "X";
                         }
                         if (Firebase.RTDB.getString(&fbdo, "/btn-heater")) {
                                 stateHeater = fbdo.to<String>().toFloat();
+                                cekKoneksi = "V";
+                        } else {
+                                cekKoneksi = "X";
                         }
                         if (Firebase.RTDB.getString(&fbdo, "/btn-pHdown")) {
                                 statePhDown = fbdo.to<String>().toFloat();
+                                cekKoneksi = "V";
+                        } else {
+                                cekKoneksi = "X";
                         }
                         if (Firebase.RTDB.getString(&fbdo, "/btn-pHup")) {
                                 statePhUp = fbdo.to<String>().toFloat();
+                                cekKoneksi = "V";
+                        } else {
+                                cekKoneksi = "X";
                         }
                         if (Firebase.RTDB.getString(&fbdo, "/btn-mode")) {
                                 stateMode = fbdo.to<String>().toFloat();
+                                cekKoneksi = "V";
+                        } else {
+                                cekKoneksi = "X";
                         }
                 }
                 vTaskDelay(20 / portTICK_PERIOD_MS);

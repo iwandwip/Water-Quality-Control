@@ -61,8 +61,8 @@ void setup() {
         pinMode(PHUP_OUTPUT_PIN, OUTPUT);
 
         digitalWrite(PENGISIAN_OUTPUT_PIN, HIGH);
-        digitalWrite(PENGURASAN_OUTPUT_PIN, HIGH);
-        digitalWrite(HEATER_OUTPUT_PIN, HIGH);
+        digitalWrite(PENGURASAN_OUTPUT_PIN, !HIGH);
+        digitalWrite(HEATER_OUTPUT_PIN, !HIGH);
         digitalWrite(PHDOWN_OUTPUT_PIN, HIGH);
         digitalWrite(PHUP_OUTPUT_PIN, HIGH);
 
@@ -197,11 +197,11 @@ void loop() {
                 statePhUp = (statePhUp > 0.5) ? 1 : 0;
         }
 
-        digitalWrite(PENGISIAN_OUTPUT_PIN, !statePengisian);
-        digitalWrite(PENGURASAN_OUTPUT_PIN, statePengurasan);
-        digitalWrite(HEATER_OUTPUT_PIN, stateHeater);
-        digitalWrite(PHDOWN_OUTPUT_PIN, !statePhDown);
-        digitalWrite(PHUP_OUTPUT_PIN, !statePhUp);
+        // digitalWrite(PENGISIAN_OUTPUT_PIN, !statePengisian);
+        // digitalWrite(PENGURASAN_OUTPUT_PIN, statePengurasan);
+        // digitalWrite(HEATER_OUTPUT_PIN, stateHeater);
+        // digitalWrite(PHDOWN_OUTPUT_PIN, !statePhDown);
+        // digitalWrite(PHUP_OUTPUT_PIN, !statePhUp);
 
         // digitalWrite(PENGISIAN_OUTPUT_PIN, HIGH);
         // digitalWrite(PENGURASAN_OUTPUT_PIN, HIGH);
